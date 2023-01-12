@@ -1,40 +1,7 @@
 <template>
   <Header></Header>
-  <!--tab-->
   <div class="shop">
     <!--list-->
-    <!-- <ul>
-      <li v-for="product in products" :key="product.order">
-        <a>
-          <div class="productimgdiv">
-            <img class="productimg" :src="product.img" />
-          </div>
-          <div>
-            <text class="name">{{ product.name }}</text>
-            <br />
-            <text class="price">NT {{ product.price }}</text>
-          </div>
-          <div class="count">
-            <button
-              class="countbutton"
-              @click="--product.count"
-              :disabled="product.count <= 0 ? true : false"
-            >
-              -
-            </button>
-            <input
-              class="countinput"
-              type="number"
-              min="0"
-              @change="(event) => (product.count = changeCheck(event))"
-              @input="(event) => (product.count = inputCheck(event))"
-              :value="product.count"
-            />
-            <button class="countbutton" @click="++product.count">+</button>
-          </div>
-        </a>
-      </li>
-    </ul> -->
     <ul>
       <Product
         v-for="product in products"
@@ -50,15 +17,17 @@
       ></Product>
     </ul>
   </div>
-  <Cart></Cart>
+  <Cart :products="products"></Cart>
   <Footer></Footer>
 </template>
 
 <script>
+// "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdT5bgMRA_5ux-ry_oV-J043JzTjvnxeki1CuKIvwZMTb8alw/formResponse"
 import Header from "@/components/HeaderView.vue";
 import Product from "@/components/ProductView.vue";
 import Cart from "@/components/CartView.vue";
 import Footer from "@/components/FooterView.vue";
+import axios from "axios";
 
 import 一起搖擺 from "@/assets/一起搖擺.jpg";
 import 小鹿亂撞 from "@/assets/小鹿亂撞.jpg";
@@ -166,23 +135,19 @@ export default {
       order: 0,
     };
   },
-  methods: {
-    countCheck(count) {
-      if (!count) return 0;
-      if (count >= 0) return parseInt(count);
-      return 0;
-    },
-  },
   components: {
     Header,
     Product,
     Cart,
     Footer,
   },
-  provide() {
-    return {
-      products: this.products,
-    };
+  methods: {
+    summit() {
+      axios.post(
+        "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdT5bgMRA_5ux-ry_oV-J043JzTjvnxeki1CuKIvwZMTb8alw/formResponse",
+        {}
+      );
+    },
   },
 };
 </script>

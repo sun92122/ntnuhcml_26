@@ -1,12 +1,9 @@
 <template>
   <div class="cart">
-    <div>123</div>
-    <ul>
-      <li v-for="product in products" :key="product.order">
-        <text>{{ product.count }}</text>
-        <text>\nHi\n</text>
-      </li>
-    </ul>
+    <hr />
+    <div v-for="product in products" :key="product.order">
+      {{ product.count }}
+    </div>
   </div>
 </template>
 
@@ -15,17 +12,8 @@ export default {
   name: "CartView",
   props: {
     msg: String,
-    products: [
-      {
-        order: Number,
-        name: String,
-        count: Number,
-        price: Number,
-        img: Image,
-      },
-    ],
+    products: Array,
   },
-  emits: ["products"],
 };
 </script>
 
