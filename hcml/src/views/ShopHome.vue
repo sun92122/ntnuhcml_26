@@ -3,7 +3,7 @@
   <!--tab-->
   <div class="shop">
     <!--list-->
-    <ul>
+    <!-- <ul>
       <li v-for="product in products" :key="product.order">
         <a>
           <div class="productimgdiv">
@@ -34,14 +34,32 @@
           </div>
         </a>
       </li>
+    </ul> -->
+    <ul>
+      <Product
+        v-for="product in products"
+        :key="product.order"
+        :name="product.name"
+        :price="product.price"
+        :img="product.img"
+        :count="product.count"
+        @minus-click="--product.count"
+        @add-click="++product.count"
+        @input-change="(count) => (product.count = count)"
+        @input-input="(count) => (product.count = count)"
+      ></Product>
     </ul>
   </div>
+  <Cart></Cart>
   <Footer></Footer>
 </template>
 
 <script>
 import Header from "@/components/HeaderView.vue";
+import Product from "@/components/ProductView.vue";
+import Cart from "@/components/CartView.vue";
 import Footer from "@/components/FooterView.vue";
+
 import 一起搖擺 from "@/assets/一起搖擺.jpg";
 import 小鹿亂撞 from "@/assets/小鹿亂撞.jpg";
 import 勿擾模式 from "@/assets/勿擾模式.jpg";
@@ -56,110 +74,115 @@ import 鋼琴兔 from "@/assets/鋼琴兔.jpg";
 import 鯨生今世 from "@/assets/鯨生今世.jpg";
 
 export default {
-  data: function () {
+  name: "ShopView",
+  data() {
     return {
-      products: {
-        一起搖擺: {
+      products: [
+        {
           order: 101,
           name: "一起搖擺",
           count: 0,
           price: 95,
           img: 一起搖擺,
         },
-        小鹿亂撞: {
+        {
           order: 102,
           name: "小鹿亂撞",
           count: 0,
           price: 95,
           img: 小鹿亂撞,
         },
-        勿擾模式: {
+        {
           order: 103,
           name: "勿擾模式",
           count: 0,
           price: 100,
           img: 勿擾模式,
         },
-        天鵝湖: {
+        {
           order: 104,
           name: "天鵝湖",
           count: 0,
           price: 100,
           img: 天鵝湖,
         },
-        成雙成對: {
+        {
           order: 105,
           name: "成雙成對",
           count: 0,
           price: 100,
           img: 成雙成對,
         },
-        海洋之星: {
+        {
           order: 106,
           name: "海洋之星",
           count: 0,
           price: 100,
           img: 海洋之星,
         },
-        海洋精靈: {
+        {
           order: 201,
           name: "海洋精靈",
           count: 0,
           price: 95,
           img: 海洋精靈,
         },
-        乾啦乾啦: {
+        {
           order: 202,
           name: "乾啦乾啦",
           count: 0,
           price: 95,
           img: 乾啦乾啦,
         },
-        陪你咪咪: {
+        {
           order: 203,
           name: "陪你咪咪",
           count: 0,
           price: 100,
           img: 陪你咪咪,
         },
-        熊熊魚見你: {
+        {
           order: 204,
           name: "熊熊魚見你",
           count: 0,
           price: 100,
           img: 熊熊魚見你,
         },
-        鋼琴兔: {
+        {
           order: 205,
           name: "鋼琴兔",
           count: 0,
           price: 100,
           img: 鋼琴兔,
         },
-        鯨生今世: {
+        {
           order: 206,
           name: "鯨生今世",
           count: 0,
           price: 100,
           img: 鯨生今世,
         },
-      },
+      ],
       order: 0,
     };
   },
   methods: {
-    inputCheck(event) {
-      if (event.target.value >= 0) return event.target.value;
+    countCheck(count) {
+      if (!count) return 0;
+      if (count >= 0) return parseInt(count);
       return 0;
-    },
-    changeCheck(event) {
-      if (!event.target.value) return 0;
-      return parseInt(event.target.value);
     },
   },
   components: {
     Header,
+    Product,
+    Cart,
     Footer,
+  },
+  provide() {
+    return {
+      products: this.products,
+    };
   },
 };
 </script>
