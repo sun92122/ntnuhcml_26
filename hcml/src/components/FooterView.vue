@@ -27,6 +27,7 @@ export default {
 
 <style scoped lang="scss">
 .footer {
+  float: left;
   width: 100%;
   color: black;
   height: auto;
