@@ -2,7 +2,7 @@
   <Header></Header>
   <div class="shop">
     <!--list-->
-    <ul>
+    <ul :hidden="!showProduct">
       <Product
         v-for="product in products"
         :key="product.order"
@@ -16,8 +16,8 @@
         @input-input="(count) => (product.count = count)"
       ></Product>
     </ul>
+    <Cart :products="products" :price="price" @next-button="next"></Cart>
   </div>
-  <Cart :products="products"></Cart>
   <Footer></Footer>
 </template>
 
@@ -53,6 +53,7 @@ export default {
           count: 0,
           price: 95,
           img: 一起搖擺,
+          id: "entry.584544530",
         },
         {
           order: 102,
@@ -60,6 +61,7 @@ export default {
           count: 0,
           price: 95,
           img: 小鹿亂撞,
+          id: "entry.956142372",
         },
         {
           order: 103,
@@ -67,6 +69,7 @@ export default {
           count: 0,
           price: 100,
           img: 勿擾模式,
+          id: "entry.510653683",
         },
         {
           order: 104,
@@ -74,6 +77,7 @@ export default {
           count: 0,
           price: 100,
           img: 天鵝湖,
+          id: "entry.1843417491",
         },
         {
           order: 105,
@@ -81,6 +85,7 @@ export default {
           count: 0,
           price: 100,
           img: 成雙成對,
+          id: "entry.2002409377",
         },
         {
           order: 106,
@@ -88,6 +93,7 @@ export default {
           count: 0,
           price: 100,
           img: 海洋之星,
+          id: "entry.1222343532",
         },
         {
           order: 201,
@@ -95,6 +101,7 @@ export default {
           count: 0,
           price: 95,
           img: 海洋精靈,
+          id: "entry.235297845",
         },
         {
           order: 202,
@@ -102,6 +109,7 @@ export default {
           count: 0,
           price: 95,
           img: 乾啦乾啦,
+          id: "entry.1392893535",
         },
         {
           order: 203,
@@ -109,6 +117,7 @@ export default {
           count: 0,
           price: 100,
           img: 陪你咪咪,
+          id: "entry.1266469000",
         },
         {
           order: 204,
@@ -116,6 +125,7 @@ export default {
           count: 0,
           price: 100,
           img: 熊熊魚見你,
+          id: "entry.153173846",
         },
         {
           order: 205,
@@ -123,6 +133,7 @@ export default {
           count: 0,
           price: 100,
           img: 鋼琴兔,
+          id: "entry.673355475",
         },
         {
           order: 206,
@@ -130,9 +141,10 @@ export default {
           count: 0,
           price: 100,
           img: 鯨生今世,
+          id: "entry.178825790",
         },
       ],
-      order: 0,
+      showProduct: true,
     };
   },
   components: {
@@ -141,12 +153,44 @@ export default {
     Cart,
     Footer,
   },
+  computed: {
+    price() {
+      var total = 0;
+      for (var product of this.products) {
+        var count = parseInt(product.count);
+        if (count > 0) {
+          total += count * product.price;
+        }
+      }
+      return total;
+    },
+    summitData() {
+      var data = "";
+      for (var product of this.products) {
+        if (product.count > 0) {
+          if (data != "") data += "&";
+          data += product.id + "=" + String(product.count);
+        }
+      }
+      console.info(data);
+      return data;
+    },
+  },
   methods: {
     summit() {
       axios.post(
         "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdT5bgMRA_5ux-ry_oV-J043JzTjvnxeki1CuKIvwZMTb8alw/formResponse",
-        {}
+        this.summitData
       );
+    },
+    next() {
+      this.showProduct = false;
+      this.summit(); //test
+      this.showProduct = true;
+      // for (var product of this.products) {
+      //   product.count = 0;
+      // }
+      return;
     },
   },
 };
