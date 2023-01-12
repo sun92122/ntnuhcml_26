@@ -24,6 +24,7 @@
           @change="(event) => $emit('input-change', changeCheck(event))"
           @input="(event) => $emit('input-input', inputCheck(event))"
           :value="count"
+          :autocomplete="off"
         />
         <button class="countbutton" @click="$emit('add-click')">+</button>
       </div>
