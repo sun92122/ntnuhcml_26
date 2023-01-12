@@ -1,48 +1,62 @@
 <template>
   <div class="footer">
-    <div class="container h-100">
-      <div class="row p-5 h-100 justify-content-center align-items-center">
-        <!--footer畫面左區-->
-        <div class="col-sm-12 col-md-7">
-          <h3>Find Us</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-          <button
-            @click="gostores"
-            class="btn custom-btn btn-outline-primary mr-4"
-          >
-            Stores Information
-          </button>
-        </div>
-        <!--footer畫面右區-->
-        <div class="col-sm-12 col-md-4 m-3">
-          <img src="/img/layout/footer.jpg" alt="" width="300" />
-        </div>
-      </div>
+    <img class="footerimg" :src="footerimg" />
+    <div class="copyrightdiv">
+      <p class="copyright">
+        本網站著作由國立臺灣師範大學竹苗地區同鄉校友會擁有
+      </p>
     </div>
   </div>
 </template>
 
 <script>
+import footerimg from "@/assets/FooterImage.jpg";
+
 export default {
   name: "FooterView",
   props: {
     msg: String,
   },
-  methods: {
-    gostores() {
-      this.$router.replace("stores");
-    },
+  data: function () {
+    return {
+      footerimg,
+    };
   },
 };
 </script>
 
 <style scoped lang="scss">
 .footer {
-  padding-top: 7rem;
   width: 100%;
-  min-height: 500px;
-  text-align: left;
-  color: #ffffff;
-  background-color: darkslategray;
+  color: black;
+  height: auto;
+  min-height: 100px;
+  position: relative;
+}
+
+.footerimg {
+  z-index: 0;
+  width: 100%;
+  position: relative;
+}
+.copyrightdiv {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  width: 100%;
+  min-height: 100%;
+  opacity: 80%;
+  background-color: lightgray;
+}
+.copyright {
+  text-align: center;
+  color: black;
+  font-size: smaller;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
 </style>
