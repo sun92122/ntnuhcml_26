@@ -11,7 +11,7 @@
 <script>
 // @ is an alias to /src
 import Header from "@/components/HeaderView.vue";
-import Banner from "@/components/BannerView.vue";
+import Banner from "@/components/CartView.vue.js";
 import Footer from "@/components/FooterView.vue";
 
 export default {
