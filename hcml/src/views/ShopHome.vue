@@ -1,4 +1,17 @@
 <template>
+  <div
+    class="product_info_blank"
+    v-if="isShowInfo"
+    @click="isShowInfo = false"
+  ></div>
+  <div class="product_info" v-if="isShowInfo">
+    <Info
+      :name="products[infoProductKey].name"
+      :price="products[infoProductKey].price"
+      :img="products[infoProductKey].img"
+      @info-close="isShowInfo = false"
+    ></Info>
+  </div>
   <div class="screen">
     <div class="left_screen"></div>
     <div class="medium_screen">
@@ -7,20 +20,21 @@
         <!--list-->
         <ul :hidden="!showProduct">
           <Product
-            v-for="product in products"
-            :key="product.order"
+            v-for="(product, key) in products"
+            :key="key"
             :name="product.name"
             :price="product.price"
             :img="product.img"
             :count="product.count"
             @minus-click="--product.count"
             @add-click="++product.count"
+            @info-click="showInfo(key)"
             @input-change="(count) => (product.count = count)"
             @input-input="(count) => (product.count = count)"
           ></Product>
         </ul>
         <Cart
-          :products="products"
+          :products="Object.values(products)"
           :price="price"
           @next-button="next"
           class="bottom_cart"
@@ -29,7 +43,7 @@
     </div>
     <div class="right_screen">
       <Cart
-        :products="products"
+        :products="Object.values(products)"
         :price="price"
         @next-button="next"
         class="right_cart"
@@ -40,130 +54,24 @@
 </template>
 
 <script>
-// "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdT5bgMRA_5ux-ry_oV-J043JzTjvnxeki1CuKIvwZMTb8alw/formResponse"
 import Header from "@/components/HeaderView.vue";
 import Product from "@/components/ProductView.vue";
 import Cart from "@/components/CartView.vue";
 import Footer from "@/components/FooterView.vue";
+import Info from "@/components/InfoView.vue";
 import axios from "axios";
-import { useWindowSize } from "@vueuse/core";
 
-import 一起搖擺 from "@/assets/一起搖擺.jpg";
-import 小鹿亂撞 from "@/assets/小鹿亂撞.jpg";
-import 勿擾模式 from "@/assets/勿擾模式.jpg";
-import 天鵝湖 from "@/assets/天鵝湖.jpg";
-import 成雙成對 from "@/assets/成雙成對.jpg";
-import 海洋之星 from "@/assets/海洋之星.jpg";
-import 海洋精靈 from "@/assets/海洋精靈.jpg";
-import 乾啦乾啦 from "@/assets/乾啦乾啦.jpg";
-import 陪你咪咪 from "@/assets/陪你咪咪.jpg";
-import 熊熊魚見你 from "@/assets/熊熊魚見你.jpg";
-import 鋼琴兔 from "@/assets/鋼琴兔.jpg";
-import 鯨生今世 from "@/assets/鯨生今世.jpg";
+const AppScriptUrl =
+  "https://script.google.com/macros/s/AKfycbwAVnnb5sIg8ktg-UlSr5lPPyjT-D66fMKRN1hICnL7ggwPuC1uHLdRKGeC_uLTgiA9/exec";
 
 export default {
   name: "ShopView",
   data() {
     return {
-      products: [
-        {
-          order: 101,
-          name: "一起搖擺",
-          count: 0,
-          price: 95,
-          img: 一起搖擺,
-          id: "entry.584544530",
-        },
-        {
-          order: 102,
-          name: "小鹿亂撞",
-          count: 0,
-          price: 95,
-          img: 小鹿亂撞,
-          id: "entry.956142372",
-        },
-        {
-          order: 103,
-          name: "勿擾模式",
-          count: 0,
-          price: 100,
-          img: 勿擾模式,
-          id: "entry.510653683",
-        },
-        {
-          order: 104,
-          name: "天鵝湖",
-          count: 0,
-          price: 100,
-          img: 天鵝湖,
-          id: "entry.1843417491",
-        },
-        {
-          order: 105,
-          name: "成雙成對",
-          count: 0,
-          price: 100,
-          img: 成雙成對,
-          id: "entry.2002409377",
-        },
-        {
-          order: 106,
-          name: "海洋之星",
-          count: 0,
-          price: 100,
-          img: 海洋之星,
-          id: "entry.1222343532",
-        },
-        {
-          order: 201,
-          name: "海洋精靈",
-          count: 0,
-          price: 95,
-          img: 海洋精靈,
-          id: "entry.235297845",
-        },
-        {
-          order: 202,
-          name: "乾啦乾啦",
-          count: 0,
-          price: 95,
-          img: 乾啦乾啦,
-          id: "entry.1392893535",
-        },
-        {
-          order: 203,
-          name: "陪你咪咪",
-          count: 0,
-          price: 100,
-          img: 陪你咪咪,
-          id: "entry.1266469000",
-        },
-        {
-          order: 204,
-          name: "熊熊魚見你",
-          count: 0,
-          price: 100,
-          img: 熊熊魚見你,
-          id: "entry.153173846",
-        },
-        {
-          order: 205,
-          name: "鋼琴兔",
-          count: 0,
-          price: 100,
-          img: 鋼琴兔,
-          id: "entry.673355475",
-        },
-        {
-          order: 206,
-          name: "鯨生今世",
-          count: 0,
-          price: 100,
-          img: 鯨生今世,
-          id: "entry.178825790",
-        },
-      ],
+      products: {},
       showProduct: true,
+      isShowInfo: false,
+      infoProductKey: "", //"一起搖擺1",
     };
   },
   components: {
@@ -171,15 +79,12 @@ export default {
     Product,
     Cart,
     Footer,
+    Info,
   },
   computed: {
-    screenWidth() {
-      var Width = useWindowSize().width;
-      return Width.value;
-    },
     price() {
       var total = 0;
-      for (var product of this.products) {
+      for (var product of Object.values(this.products)) {
         var count = parseInt(product.count);
         if (count > 0) {
           total += count * product.price;
@@ -189,7 +94,7 @@ export default {
     },
     summitData() {
       var data = "";
-      for (var product of this.products) {
+      for (var product of Object.values(this.products)) {
         if (product.count > 0) {
           if (data != "") data += "&";
           data += product.id + "=" + String(product.count);
@@ -215,13 +120,67 @@ export default {
       // }
       return;
     },
+    showInfo(productKey) {
+      this.infoProductKey = productKey;
+      console.info(this.infoProduct);
+      this.isShowInfo = true;
+    },
+  },
+  created() {
+    axios.get(AppScriptUrl).then((res) => {
+      const tempDatas = res.data;
+      for (var i = 1; i < tempDatas.length; i++) {
+        const tempdata = tempDatas[i];
+        this.products[tempdata[0]] = {
+          name: tempdata[1],
+          price: tempdata[2],
+          img: "/" + tempdata[3],
+          info: tempdata[4].replace(/\r?\n/g, "<br />"),
+          count: 0,
+        };
+      }
+    });
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.product_info_blank {
+  position: fixed;
+  float: left;
+  z-index: 900;
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto;
+  right: 0;
+  left: 0;
+  background: #00000099;
+}
+
+.product_info {
+  position: fixed;
+  float: left;
+  z-index: 1000;
+  max-width: 600px;
+  width: 80%;
+  height: 80%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto;
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
 .screen {
-  background-color: #d3d3d3;
+  background: linear-gradient(to bottom, #6f7a7499, #8eb09a99, #fed18d99);
   display: flex;
   flex-direction: row;
   width: 100%;

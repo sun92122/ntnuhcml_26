@@ -1,11 +1,11 @@
 <template>
   <div class="product">
     <a>
-      <div class="productimgdiv">
+      <div class="productimgdiv" @click="$emit('info-click')">
         <img class="productimg" :src="img" />
       </div>
       <div>
-        <text class="name">{{ name }}</text>
+        <text class="name" @click="$emit('info-click')">{{ name }}</text>
         <br />
         <text class="price">NT {{ price }}</text>
       </div>
@@ -39,12 +39,19 @@ export default {
   name: "ProductView",
   props: {
     msg: String,
+    productKey: String,
     name: String,
     count: [Number, String],
     price: Number,
     img: null,
   },
-  emits: ["minus-click", "add-click", "input-change", "input-input"],
+  emits: [
+    "minus-click",
+    "add-click",
+    "info-click",
+    "input-change",
+    "input-input",
+  ],
   methods: {
     inputCheck(event) {
       var value = event.target.value;
@@ -148,6 +155,10 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+input {
+  -moz-appearance: textfield;
 }
 
 text.name {

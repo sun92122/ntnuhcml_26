@@ -6,7 +6,7 @@
       <div
         class="buyproduct"
         v-for="product in products"
-        :key="product.order"
+        :key="product.name"
         :hidden="product.count === 0 ? true : false"
       >
         <img :src="product.img" />
@@ -57,6 +57,7 @@ export default {
 
 h1 {
   padding: 0 1rem;
+  font-size: calc(1.25rem + 1vw);
 }
 
 .hr {
