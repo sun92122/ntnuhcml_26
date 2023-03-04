@@ -47,7 +47,7 @@ export default {
 
 <style scoped lang="scss">
 .cart {
-  float: left;
+  float: right;
   z-index: 101;
   width: 100%;
   min-height: 150px;
@@ -61,8 +61,8 @@ h1 {
 
 .hr {
   height: 2px;
-  width: 98%;
-  margin: 0 1% 2%;
+  width: 99%;
+  margin: 0 0.5% 2%;
   background-color: gray;
 }
 

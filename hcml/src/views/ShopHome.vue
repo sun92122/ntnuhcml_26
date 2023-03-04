@@ -1,22 +1,40 @@
 <template>
-  <Header></Header>
-  <div class="shop">
-    <!--list-->
-    <ul :hidden="!showProduct">
-      <Product
-        v-for="product in products"
-        :key="product.order"
-        :name="product.name"
-        :price="product.price"
-        :img="product.img"
-        :count="product.count"
-        @minus-click="--product.count"
-        @add-click="++product.count"
-        @input-change="(count) => (product.count = count)"
-        @input-input="(count) => (product.count = count)"
-      ></Product>
-    </ul>
-    <Cart :products="products" :price="price" @next-button="next"></Cart>
+  <div class="screen">
+    <div class="left_screen"></div>
+    <div class="medium_screen">
+      <Header></Header>
+      <div class="shop">
+        <!--list-->
+        <ul :hidden="!showProduct">
+          <Product
+            v-for="product in products"
+            :key="product.order"
+            :name="product.name"
+            :price="product.price"
+            :img="product.img"
+            :count="product.count"
+            @minus-click="--product.count"
+            @add-click="++product.count"
+            @input-change="(count) => (product.count = count)"
+            @input-input="(count) => (product.count = count)"
+          ></Product>
+        </ul>
+        <Cart
+          :products="products"
+          :price="price"
+          @next-button="next"
+          class="bottom_cart"
+        ></Cart>
+      </div>
+    </div>
+    <div class="right_screen">
+      <Cart
+        :products="products"
+        :price="price"
+        @next-button="next"
+        class="right_cart"
+      ></Cart>
+    </div>
   </div>
   <Footer></Footer>
 </template>
@@ -28,6 +46,7 @@ import Product from "@/components/ProductView.vue";
 import Cart from "@/components/CartView.vue";
 import Footer from "@/components/FooterView.vue";
 import axios from "axios";
+import { useWindowSize } from "@vueuse/core";
 
 import 一起搖擺 from "@/assets/一起搖擺.jpg";
 import 小鹿亂撞 from "@/assets/小鹿亂撞.jpg";
@@ -154,6 +173,10 @@ export default {
     Footer,
   },
   computed: {
+    screenWidth() {
+      var Width = useWindowSize().width;
+      return Width.value;
+    },
     price() {
       var total = 0;
       for (var product of this.products) {
@@ -197,12 +220,58 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.screen {
+  background-color: #d3d3d3;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: center;
+  padding: none;
+
+  div {
+    position: relative;
+  }
+  .medium_screen {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .right_screen {
+    width: calc(50% - 350px - 3rem);
+    float: right;
+    position: fixed;
+    z-index: 1000;
+    right: 1%;
+    top: 3%;
+    .right_cart {
+      background: none;
+    }
+  }
+}
+
 .shop {
   float: left;
   width: 100%;
+  height: auto;
   position: relative;
   z-index: 100;
-  background: linear-gradient(to bottom, #101010, #2a4a80, #c291bb);
+  background: linear-gradient(to bottom, #6f7a74, #8eb09a, #fed18d);
+}
+
+.bottom_cart {
+  display: block;
+}
+.right_cart {
+  display: none;
+}
+
+@media only screen and (min-width: 1150px) {
+  .bottom_cart {
+    display: none;
+  }
+  .right_cart {
+    display: block;
+  }
 }
 
 ul {
@@ -212,7 +281,14 @@ ul {
   width: 100%;
   column-count: 2;
   column-gap: normal;
-  column-fill: auto;
+}
+
+@media only screen and (min-width: 680px) {
+  ul {
+    column-count: auto;
+    column-width: 200px;
+    column-gap: normal;
+  }
 }
 
 li {
@@ -226,6 +302,24 @@ li {
     margin: 0 2%;
     max-width: 96%;
     height: auto;
+  }
+}
+
+@media only screen and (max-width: 550px) {
+  li {
+    min-height: 19rem;
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  li {
+    min-height: 17rem;
+  }
+}
+
+@media only screen and (max-width: 370px) {
+  li {
+    min-height: 15rem;
   }
 }
 
@@ -271,31 +365,5 @@ text.name {
 
 text.price {
   color: white;
-}
-
-@media only screen and (min-width: 600px) {
-  ul {
-    column-count: auto;
-    column-width: 200px;
-    column-gap: normal;
-  }
-}
-
-@media only screen and (max-width: 550px) {
-  li {
-    min-height: 19rem;
-  }
-}
-
-@media only screen and (max-width: 450px) {
-  li {
-    min-height: 17rem;
-  }
-}
-
-@media only screen and (max-width: 350px) {
-  li {
-    min-height: 15rem;
-  }
 }
 </style>

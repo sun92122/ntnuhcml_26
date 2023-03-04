@@ -15,7 +15,7 @@
           @click="$emit('minus-click')"
           :disabled="count <= 0 ? true : false"
         >
-          -
+          <div>-</div>
         </button>
         <input
           class="countinput"
@@ -26,7 +26,9 @@
           :value="count"
           :autocomplete="off"
         />
-        <button class="countbutton" @click="$emit('add-click')">+</button>
+        <button class="countbutton" @click="$emit('add-click')">
+          <div>+</div>
+        </button>
       </div>
     </a>
   </div>
@@ -98,17 +100,47 @@ export default {
 /* count input */
 .count {
   margin: auto;
-  min-width: none;
+  min-width: 50%;
   max-width: 75%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .countinput {
   text-align: center;
   width: 50%;
+  min-width: 1.5rem;
+  height: 2rem;
+  margin: 0;
+  background: none;
+  border: none;
 }
 
 .countbutton {
   width: 25%;
+  max-width: 25%;
+  min-width: 1rem;
+  height: 2rem;
+  margin: 0;
+  -webkit-appearance: none;
+  border: none;
+  text-align: center !important;
+  text-align-last: center !important;
+  background: none;
+  color: black;
+  position: relative;
+
+  div {
+    padding: 0;
+    margin: 0;
+    width: 80%;
+    left: 10%;
+    height: 80%;
+    top: 10%;
+    position: absolute;
+  }
 }
 
 /* Chrome, Safari, Edge, Opera */

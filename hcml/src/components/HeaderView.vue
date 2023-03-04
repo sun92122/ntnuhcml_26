@@ -22,7 +22,6 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  padding-top: 1rem;
   height: auto;
   min-height: 100px;
   text-align: left;
