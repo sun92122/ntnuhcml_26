@@ -12,6 +12,9 @@
         <text class="price">NT {{ price }}</text>
       </div>
     </a>
+    <div class="infotextdiv">
+      <div class="infotext" v-html="info"></div>
+    </div>
   </div>
 </template>
 
@@ -23,6 +26,7 @@ export default {
     productKey: String,
     name: String,
     price: Number,
+    info: String,
     img: null,
   },
   emits: ["info-close"],
@@ -76,6 +80,21 @@ export default {
     font-weight: 600;
     color: #333;
     margin-left: 1rem;
+  }
+
+  .infotextdiv {
+    margin-left: 3rem;
+    margin-right: 3rem;
+    width: 100%;
+
+    .infotext {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #000;
+      margin-left: 3rem;
+      margin-right: 3rem;
+      text-align: left;
+    }
   }
 }
 

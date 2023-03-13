@@ -9,6 +9,7 @@
       :name="products[infoProductKey].name"
       :price="products[infoProductKey].price"
       :img="products[infoProductKey].img"
+      :info="products[infoProductKey].info"
       @info-close="isShowInfo = false"
     ></Info>
   </div>
@@ -71,6 +72,7 @@ export default {
       products: {},
       showProduct: true,
       isShowInfo: false,
+      showType: "all",
       infoProductKey: "", //"一起搖擺1",
     };
   },
@@ -134,8 +136,9 @@ export default {
         this.products[tempdata[0]] = {
           name: tempdata[1],
           price: tempdata[2],
-          img: "/" + tempdata[3],
-          info: tempdata[4].replace(/\r?\n/g, "<br />"),
+          img: "/img/" + tempdata[3],
+          type: tempdata[4],
+          info: tempdata[5].replace(/\r?\n/g, "<br />"),
           count: 0,
         };
       }
