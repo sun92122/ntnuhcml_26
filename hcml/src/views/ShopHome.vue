@@ -14,7 +14,13 @@
     ></Info>
   </div>
   <div class="screen">
-    <div class="left_screen"></div>
+    <div class="left_screen">
+      <Type
+        :types="types"
+        @type-click="(type) => typeClick(type)"
+        class="left_type"
+      ></Type>
+    </div>
     <div class="medium_screen">
       <Header></Header>
       <div class="shop">
@@ -58,6 +64,7 @@
 import Header from "@/components/HeaderView.vue";
 import Product from "@/components/ProductView.vue";
 import Cart from "@/components/CartView.vue";
+import Type from "@/components/TypeView.vue";
 import Footer from "@/components/FooterView.vue";
 import Info from "@/components/InfoView.vue";
 import axios from "axios";
@@ -72,7 +79,8 @@ export default {
       products: {},
       showProduct: true,
       isShowInfo: false,
-      showType: "all",
+      showType: "所有商品",
+      types: { 所有商品: "所有商品" },
       infoProductKey: "", //"一起搖擺1",
     };
   },
@@ -82,6 +90,7 @@ export default {
     Cart,
     Footer,
     Info,
+    Type,
   },
   computed: {
     price() {
@@ -127,20 +136,29 @@ export default {
       console.info(this.infoProduct);
       this.isShowInfo = true;
     },
+    typeClick(type) {
+      this.showType = type;
+    },
   },
   created() {
     axios.get(AppScriptUrl).then((res) => {
       const tempDatas = res.data;
       for (var i = 1; i < tempDatas.length; i++) {
         const tempdata = tempDatas[i];
+        var tempType = tempdata[4].split(/\r?\n/g);
         this.products[tempdata[0]] = {
           name: tempdata[1],
           price: tempdata[2],
           img: "/img/" + tempdata[3],
-          type: tempdata[4],
+          type: tempType,
           info: tempdata[5].replace(/\r?\n/g, "<br />"),
           count: 0,
         };
+        for (var j = 0; j < tempType.length; j++) {
+          if (!this.types[tempType[j]]) {
+            this.types[tempType[j]] = tempType[j];
+          }
+        }
       }
     });
   },
@@ -151,7 +169,7 @@ export default {
 .product_info_blank {
   position: fixed;
   float: left;
-  z-index: 900;
+  z-index: 1000;
   width: 100%;
   height: 100%;
   display: inline-flex;
@@ -167,7 +185,7 @@ export default {
 .product_info {
   position: fixed;
   float: left;
-  z-index: 1000;
+  z-index: 1010;
   max-width: 600px;
   width: 80%;
   height: 80%;
@@ -198,11 +216,22 @@ export default {
     max-width: 700px;
     margin: 0 auto;
   }
+  .left_screen {
+    width: calc(50% - 350px - 3rem);
+    float: right;
+    position: fixed;
+    z-index: 990;
+    left: 1%;
+    top: 3%;
+    .left_type {
+      background: none;
+    }
+  }
   .right_screen {
     width: calc(50% - 350px - 3rem);
     float: right;
     position: fixed;
-    z-index: 1000;
+    z-index: 990;
     right: 1%;
     top: 3%;
     .right_cart {

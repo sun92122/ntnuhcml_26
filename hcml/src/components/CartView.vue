@@ -21,7 +21,9 @@
     </div>
     <p class="hr"></p>
     <div class="price">
-      {{ "總金額：" + price }}
+      <div>
+        {{ "總金額：" + price }}
+      </div>
       <button
         class="nextbutton"
         role="button"
@@ -88,7 +90,8 @@ img {
 }
 
 .price {
-  text-align: right;
+  display: flex;
+  text-align: left;
   height: 4rem;
   position: relative;
   right: 1rem;
@@ -108,9 +111,9 @@ img {
   font-size: 10px;
   font-weight: 800;
   line-height: 16px;
-  min-height: 40px;
+  min-height: 32px;
   outline: 0;
-  padding: 12px 14px;
+  padding: 8px;
   text-align: center;
   text-rendering: geometricprecision;
   text-transform: none;
@@ -127,6 +130,7 @@ img {
   background-color: initial;
   background-position: 0 0;
   color: #ff4742;
+  cursor: not-allowed;
 }
 
 .nextbutton:active {
