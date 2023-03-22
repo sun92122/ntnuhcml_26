@@ -17,6 +17,7 @@
     <div class="left_screen">
       <Type
         :types="types"
+        :showType="showType"
         @type-click="(type) => typeClick(type)"
         class="left_type"
       ></Type>
@@ -24,6 +25,12 @@
     <div class="medium_screen">
       <Header></Header>
       <div class="shop">
+        <Type
+          :types="types"
+          :showType="showType"
+          @type-click="(type) => typeClick(type)"
+          class="top_type"
+        ></Type>
         <!--list-->
         <ul :hidden="!showProduct">
           <Product
@@ -38,6 +45,7 @@
             @info-click="showInfo(key)"
             @input-change="(count) => (product.count = count)"
             @input-input="(count) => (product.count = count)"
+            v-show="product.type.includes(showType) || showType === '所有商品'"
           ></Product>
         </ul>
         <Cart
@@ -155,7 +163,7 @@ export default {
           count: 0,
         };
         for (var j = 0; j < tempType.length; j++) {
-          if (!this.types[tempType[j]]) {
+          if (tempType[j] && !this.types[tempType[j]]) {
             this.types[tempType[j]] = tempType[j];
           }
         }
@@ -249,18 +257,22 @@ export default {
   background: linear-gradient(to bottom, #6f7a74, #8eb09a, #fed18d);
 }
 
-.bottom_cart {
+.bottom_cart,
+.top_type {
   display: block;
 }
-.right_cart {
+.right_cart,
+.left_type {
   display: none;
 }
 
-@media only screen and (min-width: 1150px) {
-  .bottom_cart {
+@media only screen and (min-width: 1200px) {
+  .bottom_cart,
+  .top_type {
     display: none;
   }
-  .right_cart {
+  .right_cart,
+  .left_type {
     display: block;
   }
 }
@@ -271,6 +283,7 @@ ul {
   float: left;
   width: 100%;
   column-count: 2;
+  column-fill: balance;
   column-gap: normal;
 }
 
@@ -278,7 +291,6 @@ ul {
   ul {
     column-count: auto;
     column-width: 200px;
-    column-gap: normal;
   }
 }
 

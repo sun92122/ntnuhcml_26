@@ -7,7 +7,7 @@
         class="buyproduct"
         v-for="product in products"
         :key="product.name"
-        :hidden="product.count === 0 ? true : false"
+        :hidden="product.count == 0 ? true : false"
       >
         <img :src="product.img" />
         <div class="buyproductdata">
@@ -16,9 +16,7 @@
         </div>
       </div>
     </div>
-    <div class="emptymsg" :hidden="price === 0 ? false : true">
-      這裡空空如也
-    </div>
+    <div class="emptymsg" :hidden="price == 0 ? false : true">這裡空空如也</div>
     <p class="hr"></p>
     <div class="price">
       <div>
@@ -28,7 +26,7 @@
         class="nextbutton"
         role="button"
         @click="$emit('next-button')"
-        :disabled="price === 0 ? true : false"
+        :disabled="price == 0 ? true : false"
       >
         下一步<br />填寫訂購人資訊
       </button>
@@ -80,7 +78,7 @@ h1 {
 }
 
 img {
-  max-width: 20%;
+  max-width: 25%;
   margin: 0 1rem;
 }
 
@@ -92,9 +90,10 @@ img {
 .price {
   display: flex;
   text-align: left;
-  height: 4rem;
+  height: auto;
   position: relative;
-  right: 1rem;
+  justify-content: space-around;
+  margin-bottom: 1rem;
 }
 
 /* CSS */
@@ -110,10 +109,8 @@ img {
   font-family: nunito, roboto, proxima-nova, "proxima nova", sans-serif;
   font-size: 10px;
   font-weight: 800;
-  line-height: 16px;
-  min-height: 32px;
   outline: 0;
-  padding: 8px;
+  padding: 8px 12px;
   text-align: center;
   text-rendering: geometricprecision;
   text-transform: none;
@@ -121,7 +118,6 @@ img {
   -webkit-user-select: none;
   touch-action: manipulation;
   vertical-align: middle;
-  width: 120px;
 }
 
 .nextbutton:hover,
@@ -130,6 +126,9 @@ img {
   background-color: initial;
   background-position: 0 0;
   color: #ff4742;
+}
+
+.nextbutton:disabled {
   cursor: not-allowed;
 }
 
