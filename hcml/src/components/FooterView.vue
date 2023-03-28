@@ -1,6 +1,6 @@
 <template>
+  <img class="footerimg" :src="footerimg" />
   <div class="footer">
-    <img class="footerimg" :src="footerimg" />
     <div class="copyrightdiv">
       <p class="copyright">
         本網站著作由國立臺灣師範大學竹苗地區同鄉校友會擁有
@@ -49,7 +49,7 @@ export default {
   width: 100%;
   min-height: 100%;
   opacity: 80%;
-  background-color: lightgray;
+  background-color: #fedd966c;
 }
 .copyright {
   text-align: center;

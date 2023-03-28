@@ -2,10 +2,15 @@
   <div class="product">
     <a>
       <div class="productimgdiv" @click="$emit('info-click')">
-        <img class="productimg" :src="img" />
+        <img
+          class="productimg"
+          :src="img ? img : '/img/404.png'"
+          :alt="name + '的圖片，來攤位上看看吧'"
+          :onerror="defaultImg"
+        />
       </div>
       <div>
-        <text class="name" @click="$emit('info-click')">{{ name }}</text>
+        <text class="name" @click="$emit('info-click')" v-html="name"></text>
         <br />
         <text class="price">NT {{ price }}</text>
       </div>
@@ -34,6 +39,8 @@
 </template>
 
 <script>
+import defaultImage from "@/assets/404.png";
+
 export default {
   name: "ProductView",
   props: {
@@ -42,6 +49,7 @@ export default {
     name: String,
     count: [Number, String],
     price: Number,
+    sale: String,
     img: null,
   },
   emits: [
@@ -67,14 +75,17 @@ export default {
       return parseInt(value);
     },
   },
+  computed: {
+    defaultImg() {
+      return 'this.src="' + defaultImage + '"';
+    },
+  },
 };
 </script>
 
 <style scoped lang="scss">
 .product {
-  width: 100%;
   float: left;
-  width: 100%;
   position: relative;
   z-index: 100;
   list-style-type: none;
@@ -82,6 +93,11 @@ export default {
   min-height: 22rem;
   text-align: center;
   break-inside: avoid;
+  width: 48%;
+
+  @media only screen and (min-width: 680px) {
+    width: 30%;
+  }
 
   a {
     margin: 0 2%;
@@ -95,6 +111,7 @@ export default {
   width: 98%;
   padding: 0;
   max-height: 80%;
+  background-color: white;
 }
 
 .productimg {
@@ -161,11 +178,11 @@ input {
 }
 
 text.name {
-  color: white;
+  color: black;
 }
 
 text.price {
-  color: white;
+  color: black;
 }
 
 @media only screen and (max-width: 550px) {

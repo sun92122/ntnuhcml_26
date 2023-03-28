@@ -1,4 +1,8 @@
 <template>
+  <div class="warn_blank" v-if="isShowWarn" @click="isShowWarn = false"></div>
+  <div class="warn_info" v-if="isShowWarn">
+    <Warn @warn-close="isShowWarn = false"></Warn>
+  </div>
   <div
     class="product_info_blank"
     v-if="isShowInfo"
@@ -14,21 +18,23 @@
     ></Info>
   </div>
   <div class="screen">
-    <div class="left_screen">
+    <div class="left_screen" v-if="!shoppingDone">
       <Type
         :types="types"
         :showType="showType"
+        :showOtherType="true"
         @type-click="(type) => typeClick(type)"
         class="left_type"
       ></Type>
     </div>
     <div class="medium_screen">
       <Header></Header>
-      <div class="shop">
+      <div class="shop" v-if="!shoppingDone">
         <Type
           :types="types"
           :showType="showType"
-          @type-click="(type) => typeClick(type)"
+          :showOtherType="showOtherType"
+          @type-click="(type) => typeClick(type, showOtherType)"
           class="top_type"
         ></Type>
         <!--list-->
@@ -47,25 +53,41 @@
             @input-input="(count) => (product.count = count)"
             v-show="product.type.includes(showType) || showType === '所有商品'"
           ></Product>
+          <div class="spring" v-show="types[showType] % 3"></div>
+          <div class="spring" v-show="types[showType] % 3 == 1"></div>
         </ul>
         <Cart
           :products="Object.values(products)"
           :price="price"
-          @next-button="next"
+          :isShowImg="0"
+          @next-button="shoppingDone = true"
           class="bottom_cart"
         ></Cart>
       </div>
+      <Subscriber
+        v-if="shoppingDone"
+        :details="orderDetails"
+        :price="price"
+        :subscriber="subscriberInfo"
+        @info-change="
+          (change, changeInfo) => (subscriberInfo[change] = changeInfo)
+        "
+        @suubmitOrder="submitOrder"
+        @subscriber-close="shoppingDone = false"
+      ></Subscriber>
+      <Footer></Footer>
     </div>
     <div class="right_screen">
       <Cart
         :products="Object.values(products)"
         :price="price"
-        @next-button="next"
+        :isShowImg="products.length"
+        @next-button="shoppingDone = true"
         class="right_cart"
+        v-show="!shoppingDone"
       ></Cart>
     </div>
   </div>
-  <Footer></Footer>
 </template>
 
 <script>
@@ -75,10 +97,14 @@ import Cart from "@/components/CartView.vue";
 import Type from "@/components/TypeView.vue";
 import Footer from "@/components/FooterView.vue";
 import Info from "@/components/InfoView.vue";
+import Warn from "@/components/WarnView.vue";
+import Subscriber from "@/components/SubscriberView.vue";
 import axios from "axios";
 
 const AppScriptUrl =
   "https://script.google.com/macros/s/AKfycbwAVnnb5sIg8ktg-UlSr5lPPyjT-D66fMKRN1hICnL7ggwPuC1uHLdRKGeC_uLTgiA9/exec";
+const ToEmailUrl =
+  "https://docs.google.com/forms/u/0/d/e/1FAIpQLSd2RNZnR_1BkeLJ6LSglLfhY_HO3TkvRWSeBnfyGHfGn7aF4w/formResponse";
 
 export default {
   name: "ShopView",
@@ -86,10 +112,19 @@ export default {
     return {
       products: {},
       showProduct: true,
+      isShowWarn: true,
       isShowInfo: false,
       showType: "所有商品",
-      types: { 所有商品: "所有商品" },
+      showOtherType: true,
+      shoppingDone: false,
+      types: { 所有商品: 0 },
       infoProductKey: "", //"一起搖擺1",
+      subscriberInfo: {
+        name: "",
+        office: "",
+        phone: "",
+        email: "",
+      },
     };
   },
   components: {
@@ -99,6 +134,8 @@ export default {
     Footer,
     Info,
     Type,
+    Warn,
+    Subscriber,
   },
   computed: {
     price() {
@@ -111,41 +148,65 @@ export default {
       }
       return total;
     },
-    summitData() {
-      var data = "";
+    orderDetails() {
+      var details = "";
       for (var product of Object.values(this.products)) {
         if (product.count > 0) {
-          if (data != "") data += "&";
-          data += product.id + "=" + String(product.count);
+          if (details != "") details += "\n";
+          details +=
+            product.name +
+            "（NT " +
+            product.price +
+            "）" +
+            String(product.count) +
+            "份";
         }
       }
-      console.info(data);
+      return details;
+    },
+    summitDataToEmail() {
+      var data = {
+        "entry.1385998788": this.orderDetails,
+        "entry.500665397": this.price,
+        "entry.187237367": "無",
+        emailAddress: this.subscriberInfo.email,
+        // emailReceipt: true,
+      };
       return data;
     },
   },
   methods: {
-    summit() {
-      axios.post(
-        "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdT5bgMRA_5ux-ry_oV-J043JzTjvnxeki1CuKIvwZMTb8alw/formResponse",
-        this.summitData
-      );
-    },
-    next() {
-      this.showProduct = false;
-      this.summit(); //test
-      this.showProduct = true;
-      // for (var product of this.products) {
-      //   product.count = 0;
-      // }
-      return;
-    },
     showInfo(productKey) {
       this.infoProductKey = productKey;
       console.info(this.infoProduct);
       this.isShowInfo = true;
     },
-    typeClick(type) {
+    typeClick(type, showOtherType = false) {
       this.showType = type;
+      this.showOtherType = !showOtherType;
+    },
+    summitToEmail() {
+      axios
+        .post(ToEmailUrl, this.summitDataToEmail)
+        .then((res) => {
+          console.log(res);
+          this.shoppingDone = true;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    submitOrder() {
+      this.summitToEmail();
+      axios
+        .post(AppScriptUrl, this.summitDataToEmail)
+        .then((res) => {
+          console.log(res);
+          this.shoppingDone = true;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
   created() {
@@ -156,15 +217,20 @@ export default {
         var tempType = tempdata[4].split(/\r?\n/g);
         this.products[tempdata[0]] = {
           name: tempdata[1],
-          price: tempdata[2],
+          price: Number(tempdata[2]),
           img: "/img/" + tempdata[3],
           type: tempType,
           info: tempdata[5].replace(/\r?\n/g, "<br />"),
+          sale: tempdata[6].replace(/\r?\n/g, "<br />"),
+          other: tempdata[7].split(/\r?\n/g),
           count: 0,
         };
+        this.types.所有商品++;
         for (var j = 0; j < tempType.length; j++) {
-          if (tempType[j] && !this.types[tempType[j]]) {
-            this.types[tempType[j]] = tempType[j];
+          if (tempType[j]) {
+            if (this.types[tempType[j]] == undefined)
+              this.types[tempType[j]] = 1;
+            else this.types[tempType[j]]++;
           }
         }
       }
@@ -174,6 +240,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.warn_blank {
+  position: fixed;
+  float: left;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto;
+  right: 0;
+  left: 0;
+  background: #ffffff99;
+}
+
+.warn_info {
+  position: fixed;
+  float: left;
+  z-index: 1010;
+  max-width: 600px;
+  width: 80%;
+  height: 90%;
+  display: inline-flex;
+  align-items: center;
+  flex-direction: column;
+  margin: auto;
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
 .product_info_blank {
   position: fixed;
   float: left;
@@ -187,7 +286,7 @@ export default {
   margin: auto;
   right: 0;
   left: 0;
-  background: #00000099;
+  background: #8eb09a77;
 }
 
 .product_info {
@@ -209,39 +308,47 @@ export default {
 }
 
 .screen {
-  background: linear-gradient(to bottom, #6f7a7499, #8eb09a99, #fed18d99);
+  background-color: #fdfff0;
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: 100vw;
   align-items: flex-start;
   justify-content: center;
   padding: none;
+  scroll-behavior: smooth;
 
   div {
     position: relative;
   }
   .medium_screen {
+    min-height: 100vh;
     max-width: 700px;
     margin: 0 auto;
   }
   .left_screen {
-    width: calc(50% - 350px - 3rem);
+    width: calc(50% - 350px - 2rem);
     float: right;
     position: fixed;
     z-index: 990;
     left: 1%;
-    top: 3%;
+    top: 0;
+    bottom: 0;
+    padding-top: 3%;
+    overflow-y: auto;
     .left_type {
       background: none;
     }
   }
   .right_screen {
-    width: calc(50% - 350px - 3rem);
+    width: calc(50% - 350px - 2rem);
     float: right;
     position: fixed;
     z-index: 990;
     right: 1%;
-    top: 3%;
+    top: 0;
+    bottom: 0;
+    padding-top: 3%;
+    overflow-y: auto;
     .right_cart {
       background: none;
     }
@@ -254,7 +361,7 @@ export default {
   height: auto;
   position: relative;
   z-index: 100;
-  background: linear-gradient(to bottom, #6f7a74, #8eb09a, #fed18d);
+  background: #f8fce3;
 }
 
 .bottom_cart,
@@ -282,15 +389,11 @@ ul {
   text-align: center;
   float: left;
   width: 100%;
-  column-count: 2;
-  column-fill: balance;
-  column-gap: normal;
-}
-
-@media only screen and (min-width: 680px) {
-  ul {
-    column-count: auto;
-    column-width: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  @media only screen and (min-width: 680px) {
+    justify-content: space-around;
   }
 }
 
@@ -326,47 +429,7 @@ li {
   }
 }
 
-/* product image */
-.productimgdiv {
-  width: 98%;
-  padding: 0;
-  max-height: 80%;
-}
-
-.productimg {
-  width: 100%;
-  height: auto;
-  align-content: center;
-}
-
-/* count input */
-.count {
-  margin: auto;
-  min-width: none;
-  max-width: 75%;
-}
-
-.countinput {
-  text-align: center;
-  width: 50%;
-}
-
-.countbutton {
-  width: 25%;
-}
-
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-text.name {
-  color: white;
-}
-
-text.price {
-  color: white;
+.spring {
+  width: 30%;
 }
 </style>

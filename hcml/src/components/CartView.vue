@@ -9,7 +9,11 @@
         :key="product.name"
         :hidden="product.count == 0 ? true : false"
       >
-        <img :src="product.img" />
+        <img
+          :src="product.img"
+          :onerror="defaultImg"
+          :class="{ imgresizeto10: showImg > 5 }"
+        />
         <div class="buyproductdata">
           <div>{{ product.name }}</div>
           <div>{{ product.count + "  ×  NT " + product.price }}</div>
@@ -35,12 +39,20 @@
 </template>
 
 <script>
+import defaultImage from "@/assets/404.png";
+
 export default {
   name: "CartView",
   props: {
     msg: String,
     products: Array,
     price: Number,
+    showImg: Number,
+  },
+  computed: {
+    defaultImg() {
+      return 'this.src="' + defaultImage + '"';
+    },
   },
 };
 </script>
@@ -51,8 +63,10 @@ export default {
   z-index: 101;
   width: 100%;
   min-height: 150px;
+  max-height: 90vh;
   text-align: left;
   background-color: rgba(255, 255, 255, 0.5);
+  overscroll-behavior-y: contain;
 }
 
 h1 {
@@ -78,7 +92,8 @@ h1 {
 }
 
 img {
-  max-width: 25%;
+  max-width: 22%;
+  max-height: 8vh;
   margin: 0 1rem;
 }
 
@@ -98,8 +113,8 @@ img {
 
 /* CSS */
 .nextbutton {
-  background: #ff4742;
-  border: 1px solid #ff4742;
+  background: #8eb09a;
+  border: 1px solid #8eb09a;
   border-radius: 6px;
   box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
   box-sizing: border-box;
@@ -125,7 +140,7 @@ img {
 .nextbutton:disabled {
   background-color: initial;
   background-position: 0 0;
-  color: #ff4742;
+  color: #8eb09a;
 }
 
 .nextbutton:disabled {

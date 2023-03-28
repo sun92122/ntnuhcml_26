@@ -22,3 +22,18 @@
     <!-- built files will be auto injected -->
   </body>
 </html>
+
+<style>
+html {
+  overflow: -moz-hidden-unscrollable; /*注意！若只打 hidden，chrome 的其它 hidden 會出問題*/
+  height: 100%;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+body {
+  -ms-overflow-style: none;
+  height: 100%;
+  overflow: auto;
+}
+</style>

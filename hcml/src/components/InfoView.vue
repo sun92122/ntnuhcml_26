@@ -3,15 +3,15 @@
     <div class="close">
       <button @click="$emit('info-close')">x</button>
     </div>
-    <a>
+    <div class="product">
       <div class="productimgdiv">
-        <img class="productimg" :src="img" />
+        <img class="productimg" :src="img" :onerror="defaultImg" />
       </div>
-      <div>
+      <div class="nameandprice">
         <text class="name">{{ name }}</text>
         <text class="price">NT {{ price }}</text>
       </div>
-    </a>
+    </div>
     <div class="infotextdiv">
       <div class="infotext" v-html="info"></div>
     </div>
@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import defaultImage from "@/assets/404.png";
+
 export default {
   name: "InfoView",
   props: {
@@ -30,6 +32,11 @@ export default {
     img: null,
   },
   emits: ["info-close"],
+  computed: {
+    defaultImg() {
+      return 'this.src="' + defaultImage + '"';
+    },
+  },
 };
 </script>
 
@@ -47,7 +54,7 @@ export default {
   padding: 10px;
   margin: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #6f7a74dd;
+  background-color: #8eb09acc;
   transition: all 0.3s ease-in-out;
   text-align: left;
   &:hover {
@@ -72,7 +79,7 @@ export default {
     font-size: 1.2rem;
     font-weight: 600;
     color: #333;
-    margin-left: 3rem;
+    margin-left: 2rem;
   }
 
   .price {
@@ -87,12 +94,19 @@ export default {
     margin-right: 3rem;
     width: 100%;
 
+    -ms-overflow-style: none;
+    height: 100%;
+    overflow: auto;
+    -webkit-scrollbar {
+      display: none;
+    }
+
     .infotext {
       font-size: 1rem;
       font-weight: 500;
       color: #000;
-      margin-left: 3rem;
-      margin-right: 3rem;
+      margin-left: 2rem;
+      margin-right: 2rem;
       text-align: left;
     }
   }
@@ -113,6 +127,32 @@ export default {
     align-items: center;
     font-size: 2rem;
     color: black;
+  }
+}
+
+@media only screen and (min-width: 700px) {
+  .info {
+    .product {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      .productimgdiv {
+        width: 50%;
+      }
+
+      .nameandprice {
+        width: 50%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+
+        text {
+          margin: 0;
+        }
+      }
+    }
   }
 }
 </style>
