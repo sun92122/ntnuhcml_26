@@ -6,6 +6,9 @@ const routes = [
     path: "/",
     name: "shop",
     component: ShopHome,
+    meta: {
+      title: "竹苗週預購",
+    },
   } /*
   {
     path: "/about",
@@ -20,6 +23,11 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  window.document.title = to.meta.title;
+  next();
 });
 
 export default router;
