@@ -37,6 +37,7 @@
           @type-click="(type) => typeClick(type, showOtherType)"
           class="top_type"
         ></Type>
+        <div class="wait" v-if="types.所有商品 == 0">努力載入中...</div>
         <!--list-->
         <ul :hidden="!showProduct">
           <Product
@@ -45,6 +46,8 @@
             :name="product.name"
             :price="product.price"
             :img="product.img"
+            :sale="product.sale"
+            :other="product.other"
             :count="product.count"
             @minus-click="--product.count"
             @add-click="++product.count"
@@ -60,21 +63,27 @@
           :products="Object.values(products)"
           :price="price"
           :isShowImg="0"
-          @next-button="shoppingDone = true"
+          @next-button="
+            shoppingDone = true;
+            sendFood();
+          "
           class="bottom_cart"
         ></Cart>
       </div>
       <Subscriber
-        v-if="shoppingDone"
+        v-if="shoppingDone && !shoppingAllDone"
         :details="orderDetails"
         :price="price"
         :subscriber="subscriberInfo"
+        :food="food"
+        :foodorder="foodOrder"
         @info-change="
           (change, changeInfo) => (subscriberInfo[change] = changeInfo)
         "
-        @suubmitOrder="submitOrder"
+        @submit-order="submitOrder()"
         @subscriber-close="shoppingDone = false"
       ></Subscriber>
+      <Done v-if="shoppingAllDone"></Done>
       <Footer></Footer>
     </div>
     <div class="right_screen">
@@ -82,7 +91,10 @@
         :products="Object.values(products)"
         :price="price"
         :isShowImg="products.length"
-        @next-button="shoppingDone = true"
+        @next-button="
+          shoppingDone = true;
+          sendFood();
+        "
         class="right_cart"
         v-show="!shoppingDone"
       ></Cart>
@@ -99,12 +111,14 @@ import Footer from "@/components/FooterView.vue";
 import Info from "@/components/InfoView.vue";
 import Warn from "@/components/WarnView.vue";
 import Subscriber from "@/components/SubscriberView.vue";
+import Done from "@/components/DoneView.vue";
 import axios from "axios";
 
 const AppScriptUrl =
-  "https://script.google.com/macros/s/AKfycbwAVnnb5sIg8ktg-UlSr5lPPyjT-D66fMKRN1hICnL7ggwPuC1uHLdRKGeC_uLTgiA9/exec";
-const ToEmailUrl =
-  "https://docs.google.com/forms/u/0/d/e/1FAIpQLSd2RNZnR_1BkeLJ6LSglLfhY_HO3TkvRWSeBnfyGHfGn7aF4w/formResponse";
+  "https://script.google.com/macros/s/AKfycbxSyHs_eRLlyVlwrly2bVWITAuxWtopITwunb665jauh3x4IN-toRpcL0H8VpnhUDDR/exec";
+
+const BackgroundUrl =
+  "https://script.google.com/macros/s/AKfycbxrcM0zkKSvzm_s0hJJWJssOkfSaMQ-XY-Iq7pv_y9yy56UamDbTypqD7uJeI7JbDCy6g/exec";
 
 export default {
   name: "ShopView",
@@ -117,6 +131,7 @@ export default {
       showType: "所有商品",
       showOtherType: true,
       shoppingDone: false,
+      shoppingAllDone: false,
       types: { 所有商品: 0 },
       infoProductKey: "", //"一起搖擺1",
       subscriberInfo: {
@@ -124,6 +139,15 @@ export default {
         office: "",
         phone: "",
         email: "",
+        fooood: "",
+      },
+      food: {
+        isSameTime: true,
+        所有餐點: {
+          count: 0,
+          date: "",
+        },
+        foods: {},
       },
     };
   },
@@ -136,6 +160,7 @@ export default {
     Type,
     Warn,
     Subscriber,
+    Done,
   },
   computed: {
     price() {
@@ -164,54 +189,95 @@ export default {
       }
       return details;
     },
-    summitDataToEmail() {
-      var data = {
-        "entry.1385998788": this.orderDetails,
-        "entry.500665397": this.price,
-        "entry.187237367": "無",
-        emailAddress: this.subscriberInfo.email,
-        // emailReceipt: true,
+    foodOrder() {
+      var food = {
+        count: 0,
+        foods: [],
       };
+      for (var foodname of Object.keys(this.food.foods)) {
+        if (this.products[foodname].count > 0) {
+          food.foods.push(foodname);
+          food.count++;
+        }
+      }
+      return food;
+    },
+    summitDataToAppScript() {
+      var data =
+        "?姓名=" +
+        this.subscriberInfo.name +
+        "&系級=" +
+        this.subscriberInfo.office +
+        "&訂單明細=" +
+        this.orderDetails +
+        "&總價=" +
+        this.price +
+        "&現做餐點=" +
+        this.subscriberInfo.fooood +
+        "&email=" +
+        this.subscriberInfo.email +
+        "&手機=" +
+        this.subscriberInfo.phone;
+      return data.replaceAll("\n", "<br />");
+    },
+    summitDataToBackground() {
+      var data = "?";
+      for (var product of Object.values(this.products)) {
+        if (product.count > 0) {
+          data += product.name + "=" + product.count + "&";
+        }
+      }
       return data;
     },
   },
   methods: {
     showInfo(productKey) {
       this.infoProductKey = productKey;
-      console.info(this.infoProduct);
       this.isShowInfo = true;
     },
     typeClick(type, showOtherType = false) {
       this.showType = type;
       this.showOtherType = !showOtherType;
     },
-    summitToEmail() {
-      axios
-        .post(ToEmailUrl, this.summitDataToEmail)
+    submitToBackground() {
+      axios({
+        method: "get",
+        url: BackgroundUrl + this.summitDataToBackground,
+        headers: { "Content-Type": "text/plain" },
+      })
         .then((res) => {
           console.log(res);
-          this.shoppingDone = true;
         })
         .catch((err) => {
           console.log(err);
         });
     },
     submitOrder() {
-      this.summitToEmail();
-      axios
-        .post(AppScriptUrl, this.summitDataToEmail)
+      axios({
+        method: "post",
+        url: AppScriptUrl + this.summitDataToAppScript,
+        headers: { "Content-Type": "text/plain" },
+      })
         .then((res) => {
           console.log(res);
-          this.shoppingDone = true;
+          this.shoppingAllDone = true;
         })
         .catch((err) => {
           console.log(err);
         });
+      this.submitToBackground();
+      this.shoppingAllDone = true;
+    },
+    sendFood() {
+      for (var foodname of Object.keys(this.food.foods)) {
+        this.food.foods[foodname].count = this.products[foodname].count;
+      }
     },
   },
   created() {
     axios.get(AppScriptUrl).then((res) => {
       const tempDatas = res.data;
+      var other = 0;
       for (var i = 1; i < tempDatas.length; i++) {
         const tempdata = tempDatas[i];
         var tempType = tempdata[4].split(/\r?\n/g);
@@ -233,8 +299,29 @@ export default {
             else this.types[tempType[j]]++;
           }
         }
+        if (tempType.length == 0 || tempType[0] == "") {
+          other++;
+          this.products[tempdata[0]].type = ["其他"];
+        }
+        if (this.products[tempdata[0]].other.includes("正式週取貨")) {
+          this.food.foods[tempdata[0]] = {
+            count: 0,
+            date: "",
+          };
+        }
       }
+      this.types.其他 = other;
     });
+  },
+  mounted() {
+    if (this.shoppingAllDone) return;
+    const returnValue = "表單將不會保存，確定要離開？";
+    window.onbeforeunload = (e) => {
+      e = e || window.event;
+      if (e) e.returnValue = returnValue;
+
+      return returnValue;
+    };
   },
 };
 </script>
@@ -260,11 +347,12 @@ export default {
   position: fixed;
   float: left;
   z-index: 1010;
-  max-width: 600px;
+  max-width: 515px;
   width: 80%;
-  height: 90%;
+  height: min-content;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
   margin: auto;
   right: 0;
@@ -286,7 +374,7 @@ export default {
   margin: auto;
   right: 0;
   left: 0;
-  background: #8eb09a77;
+  background: #fdfff088;
 }
 
 .product_info {
@@ -362,6 +450,10 @@ export default {
   position: relative;
   z-index: 100;
   background: #f8fce3;
+
+  .wait {
+    font-size: 1.5rem;
+  }
 }
 
 .bottom_cart,
