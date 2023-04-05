@@ -13,8 +13,10 @@
         <text class="name" @click="$emit('info-click')" v-html="name"></text>
         <br />
         <text class="price">NT {{ price }}</text>
+        <br />
+        <text class="sale" v-if="sale" v-html="sale"></text>
       </div>
-      <div class="count">
+      <div class="count" v-if="!other.includes('正式週限定')">
         <button
           class="countbutton"
           @click="$emit('minus-click')"
@@ -45,11 +47,11 @@ export default {
   name: "ProductView",
   props: {
     msg: String,
-    productKey: String,
     name: String,
     count: [Number, String],
     price: Number,
     sale: String,
+    other: Array,
     img: null,
   },
   emits: [
@@ -185,6 +187,20 @@ text.price {
   color: black;
 }
 
+@keyframes neon {
+  0%,
+  100% {
+    text-shadow: 0 0 5px #0002, 0 0 5px #0002;
+  }
+  50% {
+    text-shadow: 0 0 20px #0005, 0 0 20px #0005;
+  }
+}
+
+text.sale {
+  animation: neon 1.5s ease-in-out infinite alternate;
+}
+
 @media only screen and (max-width: 550px) {
   .product {
     min-height: 19rem;
@@ -201,5 +217,9 @@ text.price {
   .product {
     min-height: 15rem;
   }
+}
+
+.r {
+  color: red;
 }
 </style>
