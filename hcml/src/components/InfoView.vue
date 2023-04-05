@@ -25,7 +25,6 @@ export default {
   name: "InfoView",
   props: {
     msg: String,
-    productKey: String,
     name: String,
     price: Number,
     info: String,
@@ -54,7 +53,7 @@ export default {
   padding: 10px;
   margin: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #8eb09acc;
+  background-color: #f8fce3dd;
   transition: all 0.3s ease-in-out;
   text-align: left;
   &:hover {
@@ -108,6 +107,7 @@ export default {
       margin-left: 2rem;
       margin-right: 2rem;
       text-align: left;
+      text-indent: 2rem;
     }
   }
 }
