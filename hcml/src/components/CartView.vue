@@ -63,7 +63,6 @@ export default {
   z-index: 101;
   width: 100%;
   min-height: 150px;
-  max-height: 90vh;
   text-align: left;
   background-color: rgba(255, 255, 255, 0.5);
   overscroll-behavior-y: contain;
