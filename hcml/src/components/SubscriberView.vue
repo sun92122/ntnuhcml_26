@@ -129,7 +129,7 @@ export default {
         office: {
           label: "系級或處室",
           type: "text",
-          placeholder: "請輸入您的系級/處室",
+          placeholder: "範例：物理114、課外組",
           autocomplete: "office",
           value: this.subscriber.office,
           name: "office",
