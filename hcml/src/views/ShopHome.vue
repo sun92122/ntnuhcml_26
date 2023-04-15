@@ -133,7 +133,7 @@ export default {
       shoppingDone: false,
       shoppingAllDone: false,
       types: { 所有商品: 0 },
-      infoProductKey: "", //"一起搖擺1",
+      infoProductKey: "",
       subscriberInfo: {
         name: "",
         office: "",
